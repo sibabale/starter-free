@@ -5,6 +5,7 @@ import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
 import { Provider } from 'app/provider'
 import { NativeToast } from '@my/ui/src/NativeToast'
+import { ToastProvider, ToastViewport } from '@tamagui/toast'
 
 export const unstable_settings = {
   // Ensure that reloading on `/user` keeps a back button present.
@@ -40,8 +41,11 @@ function RootLayoutNav() {
   return (
     <Provider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack />
-        <NativeToast />
+        <ToastProvider>
+          <Stack />
+          <NativeToast />
+          <ToastViewport />
+        </ToastProvider>
       </ThemeProvider>
     </Provider>
   )
