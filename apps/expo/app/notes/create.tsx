@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import React, { useRef } from 'react'
 import { YStack, XStack } from 'tamagui'
 
-import BackButton from 'app/components/atoms/back-button'
+import BackButton from 'app/components/atoms/BackButton'
 import NoteInputForm from 'app/components/molecules/NoteInputForm'
 import { useNoteManager } from 'app/hooks/useNoteManger'
 

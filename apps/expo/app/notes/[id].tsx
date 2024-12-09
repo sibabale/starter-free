@@ -6,7 +6,7 @@ import { YStack, XStack, Button } from 'tamagui'
 import React, { useRef, useEffect, useState } from 'react'
 
 import { Note } from 'app/types/note'
-import BackButton from 'app/components/atoms/back-button'
+import BackButton from 'app/components/atoms/BackButton'
 import NoteInputForm from 'app/components/molecules/NoteInputForm'
 import { useNoteManager } from 'app/hooks/useNoteManger'
 import { loadNotes, deleteNote } from 'app/utils/storage'
