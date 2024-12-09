@@ -1,9 +1,9 @@
-import { Search, } from '@tamagui/lucide-icons'
+import { Search } from '@tamagui/lucide-icons'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { useRouter } from 'solito/navigation'
 import { useFocusEffect } from '@react-navigation/native'
 import React, { useState } from 'react'
-import {Input, H4, YStack, XStack, Button, ScrollView } from 'tamagui'
+import { Input, Text, H4, YStack, XStack, Button, ScrollView } from 'tamagui'
 
 import NoteItem from '../../components/molecules/NoteItem'
 import { loadNotes } from '../../utils/storage'
@@ -13,11 +13,7 @@ export function NoteListScreen() {
   const router = useRouter()
   const [isSearching, setIsSearching] = useState(false)
 
-  const {
-    searchQuery,
-    notes: filteredNotes,
-    handleSearchQueryChange,
-  } = useNoteManager()
+  const { searchQuery, notes: filteredNotes, handleSearchQueryChange } = useNoteManager()
 
   useFocusEffect(
     React.useCallback(() => {
@@ -35,7 +31,6 @@ export function NoteListScreen() {
         <Button unstyled icon={<ArrowLeft size="$2" />} onPress={() => router.push('/')} />
         {!isSearching && <H4 marginLeft="$5">All Notes</H4>}
         <XStack paddingHorizontal="$3" backgroundColor="white" alignItems="center">
-    
           {isSearching && (
             <Input
               color="black"
@@ -53,19 +48,24 @@ export function NoteListScreen() {
             />
           )}
 
-<Button
-            unstyled 
-            icon={<Search color="gray" size="$2" />} 
-            onPress={() => setIsSearching(!isSearching)} 
+          <Button
+            unstyled
+            icon={<Search color="gray" size="$2" />}
+            onPress={() => setIsSearching(!isSearching)}
           />
-         
         </XStack>
       </XStack>
       <ScrollView showsVerticalScrollIndicator={false}>
         {filteredNotes.length > 0 ? (
           filteredNotes.map((note) => <NoteItem key={note.id} note={note} />)
+        ) : isSearching && filteredNotes.length <= 0 ? (
+          <YStack flex={1} jc="center" alignItems="center" mt={200}>
+            <Text>No notes found</Text>
+          </YStack>
         ) : (
-          <Button onPress={() => router.push('/notes/create')}>Create New Note</Button>
+          <YStack flex={1} jc="center" alignItems="center" mt={200}>
+            <Text>You have no notes yet</Text>
+          </YStack>
         )}
       </ScrollView>
     </YStack>
