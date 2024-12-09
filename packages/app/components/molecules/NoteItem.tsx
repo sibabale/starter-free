@@ -2,8 +2,8 @@ import React from 'react'
 import { useRouter } from 'solito/navigation'
 import { Text, Stack } from 'tamagui'
 
-import { Note } from '../types/note'
-import { useNoteManager } from '../hooks/useNoteManger'
+import { Note } from '../../types/note'
+import { useNoteManager } from '../../hooks/useNoteManger'
 interface NoteItemProps {
   note: Note
   active: boolean
