@@ -32,7 +32,7 @@
   "dependencies": {
     "@babel/runtime": "^7.24.6",
     "@react-native-async-storage/async-storage": "^2.1.0",
-    "@tamagui/cli": "^1.119.0",
+    "@tamagui/cli": "^1.120.0",
     "check-dependency-version-consistency": "^4.1.0",
     "eslint": "^9.3.0",
     "husky": "^9.1.6",
