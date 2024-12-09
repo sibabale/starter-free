@@ -2,11 +2,11 @@ import { Note } from '../../types/note'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { loadNotes } from '../../utils/storage'
 import { useRouter } from 'solito/navigation'
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { H4, YStack, XStack, Button, ScrollView } from 'tamagui'
 
-import NoteItem from '../../components/note-item'
+import NoteItem from '../../components/molecules/NoteItem'
 
 export function NoteListScreen() {
   const [notes, setNotes] = useState<Note[]>([])
@@ -19,10 +19,9 @@ export function NoteListScreen() {
         setNotes(loadedNotes)
       }
       fetchNotes()
-      return () => {
-      };
+      return () => {}
     }, [])
-  );
+  )
 
   return (
     <YStack padding="$4" backgroundColor="white" space flex={1} jc="center">

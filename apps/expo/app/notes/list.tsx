@@ -1,4 +1,4 @@
-import { NoteListScreen } from 'app/features/notes/list-screen'
+import { NoteListScreen } from 'app/features/notes/ListScreen'
 import { Stack } from 'expo-router'
 import { useParams } from 'solito/navigation'
 import { SafeAreaView } from 'react-native-safe-area-context'
