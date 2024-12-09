@@ -102,3 +102,17 @@ You may potentially want to have the native module transpiled for the next app. 
 - Install command to be `yarn set version stable && yarn install`
 - Build command: leave default setting
 - Output dir: leave default setting
+
+## Run Apps
+
+### Mobile
+
+```sh
+  cd apps/expo && yarn start -c
+```
+
+### Web
+
+```sh
+  cd apps/next && yarn dev
+```
