@@ -9,16 +9,34 @@ export const useNoteManager = () => {
   const [notes, setNotes] = useState<Note[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('') // New state for search
+  const [filteredNotes, setFilteredNotes] = useState<Note[]>([]) // Filtered notes based on search
 
   useEffect(() => {
     const fetchNotes = async () => {
       const loadedNotes = await loadNotes()
       setNotes(loadedNotes)
+      setFilteredNotes(loadedNotes) // Initialize filteredNotes with all notes
       setSelectedNoteId(loadedNotes[0]?.id || null)
       setIsLoading(false)
     }
     fetchNotes()
   }, [])
+
+  // Update filteredNotes whenever searchQuery or notes change
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredNotes(notes)
+    } else {
+      setFilteredNotes(
+        notes.filter(
+          (note) =>
+            note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            note.content.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      )
+    }
+  }, [searchQuery, notes])
 
   const handleNoteSelection = (noteId: string) => {
     setSelectedNoteId(noteId)
@@ -40,6 +58,7 @@ export const useNoteManager = () => {
     await saveNote(newNote)
     const updatedNotes = await loadNotes()
     setNotes(updatedNotes)
+    setFilteredNotes(updatedNotes)
     handleNoteSelection(newNote.id)
     return newNote
   }
@@ -49,20 +68,27 @@ export const useNoteManager = () => {
       await deleteNote(selectedNoteId)
       const updatedNotes = notes.filter((note) => note.id !== selectedNoteId)
       setNotes(updatedNotes)
+      setFilteredNotes(updatedNotes)
       setSelectedNoteId(updatedNotes[0]?.id || null)
     }
+  }
+
+  const handleSearchQueryChange = (query: string) => {
+    setSearchQuery(query)
   }
 
   const selectedNote = notes.find((note) => note.id === selectedNoteId) || null
 
   return {
-    notes,
+    notes: filteredNotes, // Return filtered notes
     isLoading,
+    searchQuery,
     selectedNote,
     selectedNoteId,
     handleNoteChange,
     handleCreateNote,
     handleDeleteNote,
     handleNoteSelection,
+    handleSearchQueryChange, // Expose search query handler
   }
 }

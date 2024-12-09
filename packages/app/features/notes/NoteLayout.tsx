@@ -13,11 +13,18 @@ import NoteItem from '../../components/molecules/NoteItem'
 import NoteInputForm from 'app/components/molecules/NoteInputForm'
 import { HomeScreen } from 'app/features/home/screen'
 import { saveNote, deleteNote, loadNotes } from 'app/utils/storage'
+import { useNoteManager } from 'app/hooks/useNoteManger'
 
 const NoteLayout: React.FC = () => {
+  const toast = useToastController()
   const params = useParams()
   const router = useRouter()
-  const toast = useToastController()
+  const {
+    searchQuery,
+    handleNoteChange,
+    notes: filteredNotes,
+    handleSearchQueryChange,
+  } = useNoteManager()
 
   const [notes, setNotes] = useState<Note[]>([])
   const noteInputFormRef = useRef<any>(null)
@@ -83,12 +90,6 @@ const NoteLayout: React.FC = () => {
     }
   }
 
-  const handleNoteChange = (updatedNote: Note) => {
-    setNotes((prevNotes) =>
-      prevNotes.map((note) => (note.id === updatedNote.id ? updatedNote : note))
-    )
-  }
-
   const handleCreateNote = async () => {
     const newNote: Note = {
       id: uuidv4(),
@@ -138,6 +139,8 @@ const NoteLayout: React.FC = () => {
             color="black"
             fontSize="$3"
             width="100%"
+            value={searchQuery}
+            onChangeText={handleSearchQueryChange}
             placeholder="Search"
             borderColor="transparent"
             borderRadius={0}
@@ -150,14 +153,18 @@ const NoteLayout: React.FC = () => {
         <YStack flex={1} borderWidth={1} borderTopColor="lightgray">
           <ScrollView showsVerticalScrollIndicator={false}>
             <YStack padding="$2">
-              {notes.map((note) => (
-                <NoteItem
-                  active={selectedNote?.id === note.id}
-                  key={note.id}
-                  note={note}
-                  onClick={() => handleNoteSelection(note.id)}
-                />
-              ))}
+              {filteredNotes.length > 0 ? (
+                filteredNotes.map((note) => (
+                  <NoteItem
+                    active={selectedNote?.id === note.id}
+                    key={note.id}
+                    note={note}
+                    onClick={() => handleNoteSelection(note.id)}
+                  />
+                ))
+              ) : (
+                <Text color="gray">Not notes found</Text>
+              )}
             </YStack>
           </ScrollView>
         </YStack>
