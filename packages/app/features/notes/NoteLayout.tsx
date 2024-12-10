@@ -8,7 +8,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Text, XStack, YStack, Input, Button, ScrollView } from 'tamagui'
 
 import { Note } from 'app/types/note'
-import Loader from '../../components/atoms/loader'
 import NoteItem from '../../components/molecules/NoteItem'
 import NoteInputForm from 'app/components/molecules/NoteInputForm'
 import { HomeScreen } from 'app/features/home/screen'
@@ -26,37 +25,21 @@ const NoteLayout: React.FC = () => {
     handleSearchQueryChange,
   } = useNoteManager()
 
-  const [notes, setNotes] = useState<Note[]>([])
+  const [notes, setNotes] = useState<Note[] | null>(null) // Start with null to indicate "not fetched yet"
   const noteInputFormRef = useRef<any>(null)
 
-  const [selectedNoteId, setSelectedNoteId] = useState(params?.id)
-  const [isLoading, setIsLoading] = useState(true)
+  const [selectedNoteId, setSelectedNoteId] = useState(params?.id || null)
 
   useEffect(() => {
     const fetchNotes = async () => {
       const newNotes = await loadNotes()
-      setNotes(newNotes)
+      setNotes(newNotes) // Set notes once fetched
+      if (!selectedNoteId && newNotes.length > 0) {
+        setSelectedNoteId(newNotes[0].id) // Automatically select the first note if none is selected
+      }
     }
     fetchNotes()
-  }, [])
-
-  useEffect(() => {
-    if (params?.id) {
-      setSelectedNoteId(params?.id)
-      setIsLoading(false)
-    } else if (notes.length > 0) {
-      setSelectedNoteId(notes[0].id)
-    }
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-  }, [params, notes])
-
-  useEffect(() => {
-    if (notes.length === 0) {
-      router.prefetch('/notes')
-    }
-  }, [notes, router])
+  }, [selectedNoteId])
 
   const handleNoteSelection = (noteId: string) => {
     setSelectedNoteId(noteId)
@@ -66,24 +49,26 @@ const NoteLayout: React.FC = () => {
   const handleDeleteNote = async () => {
     if (selectedNoteId) {
       try {
-        const indexToDelete = notes.findIndex((note) => note.id === selectedNoteId)
+        const indexToDelete = notes?.findIndex((note) => note.id === selectedNoteId)
 
-        await deleteNote(selectedNoteId)
+        if (indexToDelete !== undefined && indexToDelete >= 0) {
+          await deleteNote(selectedNoteId)
 
-        const updatedNotes = notes.filter((note) => note.id !== selectedNoteId)
-        setNotes(updatedNotes)
+          const updatedNotes = notes?.filter((note) => note.id !== selectedNoteId) || []
+          setNotes(updatedNotes)
 
-        if (updatedNotes.length > 0) {
-          const nextIndex = indexToDelete === 0 ? 0 : indexToDelete - 1
-          setSelectedNoteId(updatedNotes[nextIndex].id)
-          router.push(`/notes/${updatedNotes[nextIndex].id}`)
-        } else {
-          setSelectedNoteId(null)
-          router.push('/')
+          if (updatedNotes.length > 0) {
+            const nextIndex = indexToDelete === 0 ? 0 : indexToDelete - 1
+            setSelectedNoteId(updatedNotes[nextIndex].id)
+            router.push(`/notes/${updatedNotes[nextIndex].id}`)
+          } else {
+            setSelectedNoteId(null)
+            router.push('/')
+          }
+          toast.show('Note deleted successfully!', {
+            message: `The note has been removed.`,
+          })
         }
-        toast.show('Note deleted successfully!', {
-          message: `The note has been removed.`,
-        })
       } catch (error) {
         console.error('Error deleting note', error)
       }
@@ -97,16 +82,16 @@ const NoteLayout: React.FC = () => {
       content: '',
       createdAt: new Date(),
     }
-    saveNote(newNote)
+    await saveNote(newNote)
     const newNotes = await loadNotes()
     setNotes(newNotes)
     handleNoteSelection(newNote.id)
   }
 
-  const selectedNote = notes.find((note) => note.id === selectedNoteId) || null
+  const selectedNote = notes?.find((note) => note.id === selectedNoteId) || null
 
-  if (isLoading) {
-    return <Loader />
+  if (notes === null) {
+    return null
   }
 
   return (
@@ -163,7 +148,7 @@ const NoteLayout: React.FC = () => {
                   />
                 ))
               ) : (
-                <Text color="gray">Not notes found</Text>
+                <Text color="gray">No notes found</Text>
               )}
             </YStack>
           </ScrollView>
@@ -177,7 +162,7 @@ const NoteLayout: React.FC = () => {
         paddingTop={0}
         jc={notes.length > 0 ? 'flex-start' : 'center'}
       >
-        {notes.length > 0 && (
+        {notes.length > 0 ? (
           <YStack overflow="hidden">
             <XStack
               padding="$3"
@@ -188,26 +173,23 @@ const NoteLayout: React.FC = () => {
               borderBottomColor="lightgray"
             >
               <Text fontSize="$4" fontWeight="bold" color="black">
-                Nota
+                Note
               </Text>
               <Trash2 color="red" onClick={handleDeleteNote} />
             </XStack>
+            <YStack overflow="hidden" padding="$4">
+              <NoteInputForm
+                ref={noteInputFormRef}
+                onChange={handleNoteChange}
+                currentNoteId={selectedNote?.id}
+                initialTitle={selectedNote?.title || ''}
+                initialContent={selectedNote?.content || ''}
+              />
+            </YStack>
           </YStack>
+        ) : (
+          <HomeScreen />
         )}
-
-        <YStack overflow="hidden" padding="$4">
-          {notes.length > 0 ? (
-            <NoteInputForm
-              ref={noteInputFormRef}
-              onChange={handleNoteChange}
-              currentNoteId={selectedNote?.id}
-              initialTitle={selectedNote?.title || ''}
-              initialContent={selectedNote?.content || ''}
-            />
-          ) : (
-            <HomeScreen />
-          )}
-        </YStack>
       </YStack>
     </XStack>
   )
