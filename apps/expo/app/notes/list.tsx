@@ -1,10 +1,8 @@
 import { NoteListScreen } from 'app/features/notes/ListScreen'
 import { Stack } from 'expo-router'
-import { useParams } from 'solito/navigation'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Screen() {
-  const { id } = useParams()
   return (
     <>
       <Stack.Screen
